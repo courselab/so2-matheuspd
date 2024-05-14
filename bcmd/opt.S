@@ -9,6 +9,8 @@
 
 	.code16
 	.global strcmp
+	.global strlen
+	.globl itoa
 
 	## Compare two strings
 	##
@@ -44,7 +46,65 @@ strcmp_end:
 	mov strcmp_tmp, %ax  /* Restore %ax after popa.                      */
 	ret               /* Return.                                         */
 
+
+	# Convert unsigned integer in %ax to ASCII string
+	# %bx = buffer to store string (must be large enough)
+
+itoa:
+    push %bx              # Save %bx, %si, %di
+    push %si
+    push %di
+
+	mov %cx, %ax          # Move the integer parameter from %cx to %ax
+    mov %dx, %bx          # Move the buffer parameter from %dx to %bx
+
+    mov %bx, %di          # %di points to the start of the buffer
+    mov $0, %cx           # %cx is the counter for digits
+
+itoa_loop:
+    xor %dx, %dx          # Clear %dx
+    mov $10, %si          # Divide by 10
+    div %si               # %ax = %ax / 10, %dx = %ax % 10
+    add $'0', %dl         # Convert the remainder to ASCII
+    push %dx              # Push ASCII character onto stack
+    inc %cx               # Increment digit count
+    test %ax, %ax         # Check if %ax is zero
+    jnz itoa_loop         # If not, repeat
+
+# Now pop characters in reverse order to the buffer
+itoa_store:
+    pop %ax               # Pop a character
+    mov %al, (%di)        # Store it in the buffer
+    inc %di               # Move buffer pointer
+    loop itoa_store       # Repeat for all characters
+    movb $0, (%di)        # Null-terminate the string
+    pop %di               # Restore registers
+    pop %si
+    pop %bx
+    ret
+
+	## String length
+
+strlen:
+	pusha			/* Save all GP registers.              */
+    mov %cx, %bx		/* Copy argument into base register.   */
+	mov $0x0, %si		/* Initialize buffer index.            */
+strlen_loop:
+    mov (%bx, %si), %al	/* Get each ASCII character.           */
+    cmp $0x0, %al		/* End writing on 0.                   */
+    je strlen_end
+    inc %si			/* Point to the next character.        */
+    jmp strlen_loop
+strlen_end:
+    mov %si, strlen_tmp  /* Save %ax before popa.                        */
+	popa	             /* Restore all GP registers.                    */
+	mov strlen_tmp, %ax  /* Restore %ax after popa.                      */
+	ret
+
 	.section .data
 
-strcmp_tmp:	          /* Temporary memory for %ax.                       */
+strcmp_tmp:	          	/* Temporary memory for %ax.                       */
+	.byte 0x0
+
+strlen_tmp:			/* Temporary memory for %ax.                       */
 	.byte 0x0

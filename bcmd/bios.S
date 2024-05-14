@@ -81,7 +81,7 @@ readln_loop:
 	mov $0x0, %ax		/* BIOS keyboard service (blocking read).     */
 	int $0x16		/* Call BIOS keyboard service.                */
 
-	cmp $0xb, %si		/* End reading if more than 10 characters.    */
+	cmp $0x15, %si		/* End reading if more than 20 characters.    */
 	je readln_trunc
 
 	mov %al, %es:(%bx,%si)	/* Add ASCII to the buffer.                   */
