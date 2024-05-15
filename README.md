@@ -1,4 +1,5 @@
 #    SPDX-FileCopyrightText: 2024 Matheus Pereira Dias
+#    SPDX-FileCopyrightText: 2024 Gabriel Franceschi Libardi <libardi.120205@protonmail.com>
 #   
 #    SPDX-License-Identifier: GPL-3.0-or-later
 #
