@@ -6,6 +6,7 @@
 #  This file is a derivative work from SYSeg (https://gitlab.com/monaco/syseg)
 #  and contains modifications carried out by the following author(s):
 #  Matheus Pereira Dias <matheuspd07@gmail.com>
+#  Gabriel Franceschi Libardi <libardi.120205@protonmail.com>
 
  This is free software distributed under the terms of the GNU General Public 
  License version 3 of the license or, at your discretion, any later version. 
