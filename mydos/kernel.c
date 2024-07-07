@@ -87,10 +87,10 @@ void shell()
 
 struct cmd_t cmds[] =
   {
-    {"help",    f_help},     /* Print a help message.       */
-    {"quit",    f_quit},     /* Exit TyDOS.                 */
-    //{"exec",    f_exec},     /* Execute an example program. */
-	{"list", f_list_disk},	 /* List all files */
+    {"help",    f_help},     		/* Print a help message.       */
+    {"quit",    f_quit},     		/* Exit TyDOS.                 */
+    //{"exec_prog",    f_exec_prog},     	/* Execute an example program. */
+	{"list", 	f_list_disk},	 	/* List all files */
     {0, 0}
   };
 
@@ -174,7 +174,21 @@ void f_list_disk() {
   	}
 	kwrite("\n");
 }
+/*
+void f_exec_prog()
+{
+  // Program to execute
+  const char *prog_name = "prog.bin";
+  struct fs_header_t *header = (struct fs_header_t *)0x7c00;
+  unsigned short dir_start_sector = header->number_of_boot_sectors + 1;
+  unsigned short num_entries = header->number_of_file_entries * DIR_ENTRY_LEN / SECTOR_SIZE;
 
-void f_exec() {
+  extern unsigned char _MEM_POOL;
+  void *dir_address = (void *)&_MEM_POOL;
+
+  // Load the directory entries into memory
+  load_disk(dir_start_sector, num_entries, dir_address);
+
   
 }
+*/

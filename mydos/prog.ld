@@ -20,11 +20,8 @@ SECTIONS
 	
         .bin :
 	{
-        crt0.o (.text)         /* Include the startup code. */
-        *(.text)               /* Include all .text sections. */
-        *(.data)               /* Include all .data sections. */
-        *(.bss)                /* Include all .bss sections. */
-        *(.rodata)             /* Include all .rodata sections. */
+		crt0.o (.text .data .bss .rodata)
+        *.o   (.text .data .bss .rodata) /* Command line objects. */
 	  	libtydos.o (.text .data .bss .rodata) /* Runtime library. */
 
 	}		
