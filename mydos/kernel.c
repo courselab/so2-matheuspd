@@ -77,7 +77,7 @@ void shell()
 	 load it and transfer it the execution. Left as exercise. */
       
       if (!cmds[i].funct)
-	kwrite ("Command not found\n");
+	      kwrite ("Command not found\n");
     }
 }
 
@@ -89,10 +89,19 @@ struct cmd_t cmds[] =
   {
     {"help",    f_help},     /* Print a help message.       */
     {"quit",    f_quit},     /* Exit TyDOS.                 */
-    {"exec",    f_exec},     /* Execute an example program. */
+    //{"exec",    f_exec},     /* Execute an example program. */
+	{"list", f_list_disk},	 /* List all files */
     {0, 0}
   };
 
+struct fs_header_t {
+  unsigned char  signature[FS_SIGLEN];    /* The file system signature.              */
+  unsigned short total_number_of_sectors; /* Number of 512-byte disk blocks.         */
+  unsigned short number_of_boot_sectors;  /* Sectors reserved for boot code.         */
+  unsigned short number_of_file_entries;  /* Maximum number of files in the disk.    */
+  unsigned short max_file_size;		  /* Maximum size of a file in blocks.       */
+  unsigned int unused_space;              /* Remaining space less than max_file_size.*/
+} __attribute__((packed)) fs_header;      /* Disable alignment to preserve offsets.  */
 
 /* Build-in shell command: help. */
 
@@ -101,6 +110,7 @@ void f_help()
   kwrite ("...me, Obi-Wan, you're my only hope!\n\n");
   kwrite ("   But we can try also some commands:\n");
   kwrite ("      exec    (to execute an user program example\n");
+  kwrite ("      list    (to list all the files\n");
   kwrite ("      quit    (to exit TyDOS)\n");
 }
 
@@ -124,9 +134,47 @@ void f_quit()
 
   */
 
-extern int main();
-void f_exec()
-{
-  main();			/* Call the user program's 'main' function. */
+void load_disk(int sector, int num_entries, void *addres) {
+  	__asm__ volatile(
+		"pusha \n"
+      	"mov boot_drive, %%dl \n"    	/* Select the boot drive (from rt0.o) */
+      	"mov $0x2, %%ah \n"          	/* BIOS disk service: op. read sector */
+      	"mov %[NumEntr], %%al \n" 		/* How many sectors to read          */
+      	"mov $0x0, %%ch \n"          	/* Cylinder (starts at 0)  */
+      	"mov %[Sect], %%cl \n"  		/* Sector   (starts at 1)  */
+      	"mov $0x0, %%dh \n"          	/* Head     (starts at 0)      */
+      	"mov %[Addr], %%bx \n" 			/* Where to load the file system (rt0.o)   */
+      	"int $0x13 \n"               	/* Call BIOS disk service 0x13        */
+      	"popa \n" ::
+    	[Sect] "g"(sector),
+      	[NumEntr] "g"(num_entries),
+      	[Addr] "g"(addres));
 }
 
+// Function to list the contents of the disk
+void f_list_disk() {
+    // Pointer to the FS header in RAM
+    struct fs_header_t *header = (struct fs_header_t *)0x7c00;
+
+    // Calculate the starting sector of the directory region
+    unsigned short dir_start_sector = header->number_of_boot_sectors + 1;
+    unsigned short num_entries = header->number_of_file_entries * DIR_ENTRY_LEN / SECTOR_SIZE;
+
+    extern unsigned char _MEM_POOL;
+  	void *dir_address = (void *)&_MEM_POOL;
+
+  	load_disk(dir_start_sector, num_entries, dir_address);
+
+  	for (int i = 0; i < header->number_of_file_entries; i++) {
+    	char *file_name = dir_address + DIR_ENTRY_LEN * i;
+    	if (file_name[0]) {
+      		kwrite(file_name);
+      		kwrite(" ");
+    	}
+  	}
+	kwrite("\n");
+}
+
+void f_exec() {
+  
+}

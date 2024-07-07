@@ -19,11 +19,11 @@
 # exercise, redefine $(dos) to reflect your own DOS name, say
 # dos = "amazingOS" 
 
-dos=$(shell basename $$(realpath .))
+dos="SOS"
 
 # Build the OS and an example user program.
 
-all: $(dos).bin prog.bin
+all: $(dos).bin prog.bin disk.img
 
 # Link all objects needed by the OS.
 
@@ -36,7 +36,7 @@ $(dos).bin : bootloader.o bios1.o kernel.o kaux.o bios2.o logo.o syscall.o
 # from the list of pre-requisites, and edit the linker script accordingly.
 # Comment out the following line if this is the case.
 
-$(dos).bin : prog.o libtydos.o 
+# $(dos).bin : prog.o libtydos.o 
 
 # Rules to build objects from either C or assembly code.
 
@@ -58,7 +58,7 @@ $(dos).bin : .EXTRA_PREREQS = rt0.o tydos.ld
 
 progs = prog.bin
 
-$(progs)  : %.bin : %.o libtydos.a 
+$(progs)  : %.bin : %.o libtydos.a crt0.o
 	ld -melf_i386 -T prog.ld --orphan-handling=discard $< -o $@
 
 $(progs:%.bin=%.o) : %.o : %.c tydos.h
@@ -78,12 +78,24 @@ libtydos.o : tydos.h
 libtydos.a : libtydos.o
 	ar rcs $@ $^
 
+crt0.o: crt0.S
+	as --32 $< -o $@
+
+# Create a 1.44 MB floppy image (2880 * 512 bytes)
+
+disk.img:
+	dd if=/dev/zero of=$@ count=2880
+
+# Write the DOS program into disk.img without overwriting the tyFS header
+setup-dos: $(dos).bin
+	dd bs=1 if=$< of=disk.img iseek=16 oseek=16 conv=notrunc
+
 # Housekeeping.
 
 .PHONY: clean
 
 clean:
-	rm -f *.bin *.o *~ *.s *.a
+	rm -f *.bin *.o *~ *.s *.a disk.img
 
 
 ## Bintools: convenience rules for inspecting binary files

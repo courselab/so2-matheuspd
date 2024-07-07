@@ -1,3 +1,20 @@
 #    SPDX-FileCopyrightText: 2024 Matheus Pereira Dias <matheuspd07@gmail.com>
 #   
 #    SPDX-License-Identifier: GPL-3.0-or-later
+
+make all
+./tyfsedit
+    TyDOS file manager.
+    <none> open disk.img
+    [disk.img]> format
+    File has 2880 blocks of 512 bytes (1440 KB)
+    Number of sectors reserved for boot code : 10
+    Maximum file size in KBytes (1024 bytes) : 16
+    Maximum number of files will be          : 89
+    Unused space                             : 8416 (8.22 KBytes)
+    [disk.img]> put test.txt
+    [disk.img]> list
+    test.txt
+    [disk.img]> quit
+make setup-dos
+make run IMG=disk.img

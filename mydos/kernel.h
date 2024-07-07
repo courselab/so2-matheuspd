@@ -28,12 +28,17 @@ void shell();			/* Command interpreter. */
 #define BUFF_SIZE 64		/* Max command length.  */
 #define PROMPT "> "		/* Command-line prompt. */
 
+#define DIR_ENTRY_LEN 32 	  /* Max file name length in bytes.           */
+#define FS_SIGNATURE "\xeb\xety"
+#define FS_SIGLEN 4
+#define SECTOR_SIZE 512
 
 /* Built-in commands. */
 
 void f_help();
 void f_exec();
 void f_quit();
+void f_list_disk();
 
 extern struct cmd_t
 {
