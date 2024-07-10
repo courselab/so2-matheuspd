@@ -85,7 +85,7 @@ crt0.o: crt0.S
 
 disk.img:
 	dd if=/dev/zero of=$@ count=2880
-	echo "open disk.img \n format \n 12 \n 16 \n put test.txt \n put prog.bin \n quit \n" | ./tyfsedit
+	echo $'open disk.img \n format \n 15 \n 16 \n put test.txt \n put prog.bin \n quit \n' | ./tyfsedit
 
 # Write the DOS program into disk.img without overwriting the tyFS header
 setup-dos: $(dos).bin
