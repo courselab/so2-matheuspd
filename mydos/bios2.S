@@ -19,48 +19,41 @@
 	
 	.section .text
 
-	# int kread(char* buffer)
-	# Reads from the keyboard into the buffer.
-	# Returns the number of bytes read.
-	
-kread:
-        pusha                   /* Save all GP registers.                     */
+	## int kread(char* buffer, int size)
+	## Reads from the keyboard into the buffer with a maximum length 'size'.
+	## Returns the number of bytes read.
 
-        mov %cx, %bx            /* Argument received in %cx.                  */
-        mov $0x0, %si           /* Initialize buffer index.                   */
+kread:
+    pusha                   /* Save all GP registers.                     */
+    mov %cx, %bx            /* Argument received in %cx (buffer).         */
+    mov %dx, %di            /* Argument received in %dx (size).            */
+    mov $0x0, %si           /* Initialize buffer index.                   */
 
 kread_loop:
-        mov $0x0, %ax           /* BIOS keyboard service (blocking read).     */
-        int $0x16               /* Call BIOS keyboard service.                */
-
-        cmp $0xb, %si           /* End reading if more than 10 characters.    */
-        je kread_trunc
-
-        mov %al, %es:(%bx,%si)  /* Add ASCII to the buffer.                   */
-        inc %si                 /* Increment the buffer index.                */
+    mov $0x0, %ax           /* BIOS keyboard service (blocking read).     */
+    int $0x16               /* Call BIOS keyboard service.                */
+    cmp %di, %si            /* End reading if more than 'size' characters.*/
+    je kread_trunc
+    mov %al, %es:(%bx,%si)  /* Add ASCII to the buffer.                   */
+    inc %si                 /* Increment the buffer index.                */
 
 kread_trunc:
-        mov $0xe, %ah           /* Echo the ascii onto the screen.            */
-        int $0x10
-
-        cmp $0xd, %al           /* End reading if character is CR.            */
-        je kread_end
-
-        jmp kread_loop         /* Keep reading.                              */
+    mov $0xe, %ah           /* Echo the ascii onto the screen.            */
+    int $0x10
+    cmp $0xd, %al           /* End reading if character is CR.            */
+    je kread_end
+    jmp kread_loop         /* Keep reading.                              */
 
 kread_end:
-        mov $0xe, %ah           /* Echo a newline.                            */
-        mov $0xa, %al
-        int $0x10
-
-        movb $0x0, -1(%bx,%si)  /* Remove trailing CR.                        */
-
-	mov %esi, %eax		        /* Update %ax in the stack (see note 2)       */
-	dec %eax		            /* so that popa gets the computed value.      */
+    mov $0xe, %ah           /* Echo a newline.                            */
+    mov $0xa, %al
+    int $0x10
+    movb $0x0, -1(%bx,%si)  /* Null-terminate the string.                 */
+    mov %esi, %eax          /* Return the number of bytes read.           */
+	dec %eax		        /* So that popa gets the computed value.      */
 	mov %eax, 28(%esp)	
-	
-        popa                    /* Restore all GP registers.                  */
-        ret
+    popa                    /* Restore all GP registers.                  */
+    ret
 
 
 	# void delay (short t)
@@ -122,6 +115,7 @@ syscall_table:
 	.long sys_invalid	/* Syscall 0: invalid.   */
 	.long sys_exit		/* Syscall 1: exit.      */
 	.long sys_write		/* Syscall 2: write      */
+	.long sys_read      /* Syscall 3: read */
 	
 	/* Read-only data. */
 	

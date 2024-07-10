@@ -52,7 +52,7 @@ void shell()
 		do
 		{
 			kwrite(PROMPT);
-			kread(buffer);
+			kread(buffer, BUFF_SIZE);
 		} while (!buffer[0]);
 
 		/* Check for matching built-in commands */
@@ -86,7 +86,7 @@ struct cmd_t cmds[] =
 	{
 		{"help", f_help},	                /* Print a help message.       */
 		{"quit", f_quit},	                /* Exit TyDOS.                 */
-		{"exec_prog",    f_exec_prog},     	/* Execute an example program. */
+		{"exec", f_exec_prog},     			/* Execute an example program. */
 		{"list", f_list_disk},              /* List all files */
 		{0, 0}};
 
@@ -105,7 +105,7 @@ struct fs_header_t
 void f_help()
 {
 	kwrite("   Commands:\n");
-	kwrite("      exec_prog    (to execute an user program example\n");
+	kwrite("      exec    (to execute an user program example\n");
 	kwrite("      list    (to list all the files\n");
 	kwrite("      quit    (to exit TyDOS)\n");
 }
@@ -179,7 +179,7 @@ void f_exec_prog() {
     // Program to execute
 	kwrite("Enter the executable's name: ");
     char executable_name[DIR_ENTRY_LEN + 1];
-    kread(executable_name);
+    kread(executable_name, DIR_ENTRY_LEN);
 
 	// Pointer to the FS header in RAM
     struct fs_header_t *header = (struct fs_header_t *)0x7c00;

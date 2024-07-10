@@ -43,5 +43,11 @@ int syscall(int number, int arg1, int arg2, int arg3)
 
 void puts(const char* str)
 {
-  syscall (SYS_WRITE, (int) str,0,0);
+  syscall (SYS_WRITE, (int) str, 0, 0);
+}
+
+/*  Read a string from the keyboard into 'buffer' with a maximum length 'size' .*/
+void fgets(char* buffer, int size)
+{
+  syscall(SYS_READ, (int)buffer, size, 0);
 }

@@ -28,6 +28,12 @@ int _tycall_ sys_write(const char* str)
   return 0;
 }
 
+/* Read a string from the keyboard into buffer with a maximum length 'size'. */
+int _tycall_ sys_read(char* buffer, int size)
+{
+  return kread(buffer, size);
+}
+
 /*  Syscall 0 is invalid (should never be called)*/
 
 int _tycall_ sys_invalid ()

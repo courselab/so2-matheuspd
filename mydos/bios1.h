@@ -15,7 +15,6 @@
 void __attribute__((fastcall)) clear (void);
 void __attribute__((fastcall)) kwrite(const char*);
 void __attribute__((fastcall)) kwriteln(const char*);
-/* void __attribute__((fastcall)) kread(char *); */
 void __attribute__((fastcall)) fatal(const char*);
 void __attribute__((fastcall)) load_kernel(void);
 void __attribute__((fastcall)) set_cursor(char, char);
