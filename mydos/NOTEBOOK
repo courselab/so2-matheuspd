@@ -2,5 +2,24 @@
 #   
 #    SPDX-License-Identifier: GPL-3.0-or-later
 
-make all
+How to run the emulator:
+make clean
+make
 make run IMG=disk.img
+
+Commands:
+list - list files on disk
+exec - run a program by its name
+quit - exit the emulator
+
+Steps:
+1) OK
+2) OK
+3) OK
+4) Program is no longer statically linked. OK
+5) make disk.img: prepares the 1.44MB disk, formatting it and placing files inside it. OK
+6) make setup-dos: puts the operating system on the disk without overwriting the header. OK
+7) OK
+8) load_disk loads the files into memory and f_list_disk shows the names of the loaded files. OK
+9) The crt0.S file was created and linked at the beginning of the program. OK
+10) kread changed to take the size of the string to be read as a second parameter; created the syscall sys_read to implement fgets. OK
