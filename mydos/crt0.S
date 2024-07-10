@@ -4,11 +4,10 @@
 #
 #    This file is part of SYSeg, available at https://gitlab.com/monaco/syseg.
 
-crt0.s:
 .code16gcc
 .global _start
 
-.section .text
+.text
 
     jmp _start
 
