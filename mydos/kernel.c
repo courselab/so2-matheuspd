@@ -178,7 +178,7 @@ void f_list_disk()
 void f_exec_prog() {
     // Program to execute
 	kwrite("Enter the executable's name: ");
-    char executable_name[DIR_ENTRY_LEN + 1] = {0};
+    char executable_name[DIR_ENTRY_LEN + 1];
     kread(executable_name);
 
 	// Pointer to the FS header in RAM
@@ -216,7 +216,7 @@ void f_exec_prog() {
 
   	void *mem_loc = (void *)USER_PROGRAM_LOAD_ADDRESS - mem_offset;
 
-    // Load the program into memory at 0xFE00
+    // Load the program into memory at mem_loc
     load_disk(prog_start_sector, header->max_file_size, mem_loc);
 
 	 __asm__ volatile(
