@@ -6,6 +6,7 @@
 #  This file is a derivative work from SYSeg (https://gitlab.com/monaco/syseg)
 #  and contains modifications carried out by the following author(s):
 #  Matheus Pereira Dias <matheuspd07@gmail.com>
+#  Gabriel Franceschi Libardi <libardi.gabriel@usp.br>
 
 	/* This source file implements a few low-level functions needed by 
 	   the bootloader, which are easier to write directly in assembly.
@@ -26,19 +27,19 @@
 	## Clear the screen.
 	
 clear:
-	pusha			/* Save all GP registers.              */
+	pusha			    /* Save all GP registers.              */
 	mov $0x0600, %ax	/* Video service: scroll up.           */
 	mov $0x07, %bh		/* Attribute (background/foreground).  */
 	mov $0x00, %cx		/* Upper-left corner:   (0,0).         */
 	mov $0x184f, %dx	/* Botton-right corner: (24,79).       */
-	int $0x10		/* Call BIOS video service.            */
+	int $0x10		    /* Call BIOS video service.            */
 
 	mov $0x2, %ah		/* Video service: set cursor position. */
 	mov $0x0, %bh		/* Select page number 0.               */
 	mov $0x0, %dx		/* Set position (0,0).                 */
-	int $0x10		/* Call BIOS video service.            */
+	int $0x10		    /* Call BIOS video service.            */
 	
-	popa			/* Restore all GP-registers.           */
+	popa			    /* Restore all GP-registers.           */
 	ret
 
 set_cursor:
@@ -50,7 +51,7 @@ set_cursor:
 	
 	mov $0x2, %ah		/* Video service: set cursor position. */
 	mov $0x0, %bh		/* Select page number 0.               */
-	int $0x10		/* Call BIOS video service.            */	
+	int $0x10		    /* Call BIOS video service.            */	
 	popa
 	ret
 	
@@ -62,7 +63,7 @@ kwrite:
         pusha			/* Save all GP registers.              */
 
 	mov %cx, %si		/* Get the start of the buffer in %si. */
-        mov $0x0e, %ah          /* BIOS video service: TTY mode.       */
+    mov $0x0e, %ah      /* BIOS video service: TTY mode.       */
 	mov $0x0, %bh		/* Select page 0.                      */
 kwrite_loop:
 	
@@ -120,36 +121,36 @@ load_kernel:
 
 	/* Compute the kernel size in sectors.  */
 
-	xor %dx, %dx		/* Will divide %dx:%ax by %cx.         */
+	xor %dx, %dx		    /* Will divide %dx:%ax by %cx.         */
 	mov $_KERNEL_SIZE, %ax	/* Kernel size in bytes (from boot.ld).*/
-	mov $512, %cx		/* Disk sector is 512 bytes.           */
-	div %cx			/* Integher division.                  */
-	add $1, %ax		/* Result in %ax.                      */
+	mov $512, %cx		    /* Disk sector is 512 bytes.           */
+	div %cx			        /* Integher division.                  */
+	add $1, %ax		        /* Result in %ax.                      */
 	mov %ax, kernel_size	/* Store in RAM for later use.         */
 
 	/* Reset the floppy just for the case.  */
 
-	mov $0x0, %ah		/* BIOS service 0x13: test operation.  */
-	mov boot_drive, %dl	/* Select the boot drive (from rt0.o). */
-	int $0x13		/* Call BIOS disk service 0x13.        */
+	mov $0x0, %ah		    /* BIOS service 0x13: test operation.  */
+	mov boot_drive, %dl	    /* Select the boot drive (from rt0.o). */
+	int $0x13		        /* Call BIOS disk service 0x13.        */
 	jnc load_kernel_read	/* On error (CF),                      */
-	mov $err_reset, %cx	/* load error message and              */
-	call fatal		/* report fatal error.                 */
+	mov $err_reset, %cx	    /* load error message and              */
+	call fatal		        /* report fatal error.                 */
 
 load_kernel_read:
-	mov boot_drive, %dl	/* Select the boot drive (from rt0.o). */
-	mov $0x2, %ah		/* BIOS disk service: op. read sector. */
+	mov boot_drive, %dl	    /* Select the boot drive (from rt0.o). */
+	mov $0x2, %ah		    /* BIOS disk service: op. read sector. */
 	mov kernel_size, %al	/* Number of sectors to read.          */
-	mov $0x0, %ch		/* Cylinder coordinate (starts at 0).  */
-	mov $0x2, %cl		/* Sector coordinate   (starts at 1).  */
-	mov $0x0, %dh		/* Head coordinage     (starts at 0).  */
+	mov $0x0, %ch		    /* Cylinder coordinate (starts at 0).  */
+	mov $0x2, %cl		    /* Sector coordinate   (starts at 1).  */
+	mov $0x0, %dh		    /* Head coordinage     (starts at 0).  */
 	mov $_KERNEL_ADDR, %bx	/* Where to load the kernel (rt0.o).   */
-	int $0x13		/* Call BIOS disk service 0x13.        */
-	mov $err_load, %cx	/* On error (CF), report and halt.     */
+	int $0x13		        /* Call BIOS disk service 0x13.        */
+	mov $err_load, %cx	    /* On error (CF), report and halt.     */
 	jc fatal
 
-	popa			/* Restore all GP registers.           */
-	ret			/* Retur to the caller.                */
+	popa			        /* Restore all GP registers.           */
+	ret			            /* Retur to the caller.                */
 	
 	
 	## 
@@ -157,7 +158,7 @@ load_kernel_read:
 	##
 
 	.section .rodata
-	.align 4		/* Try removing this to see what happens. */
+	.align 4		        /* Try removing this to see what happens. */
 
 
 	

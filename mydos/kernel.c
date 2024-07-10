@@ -174,7 +174,7 @@ void f_list_disk()
 	}
 	kwrite("\n");
 }
-/*
+
 void f_exec_prog()
 {
   // Program to execute
@@ -190,4 +190,3 @@ void f_exec_prog()
   load_disk(dir_start_sector, num_entries, dir_address);
 
 }
-*/

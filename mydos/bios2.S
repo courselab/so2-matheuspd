@@ -55,8 +55,8 @@ kread_end:
 
         movb $0x0, -1(%bx,%si)  /* Remove trailing CR.                        */
 
-	mov %esi, %eax		/* Update %ax in the stack (see note 2)       */
-	dec %eax		/* so that popa gets the computed value.      */
+	mov %esi, %eax		        /* Update %ax in the stack (see note 2)       */
+	dec %eax		            /* so that popa gets the computed value.      */
 	mov %eax, 28(%esp)	
 	
         popa                    /* Restore all GP registers.                  */
