@@ -60,7 +60,7 @@
 
    Try the command 'help' and follow the instructions.
 
- 3) Please, chose an original name for your project.
+ 3) Please, choose an original name for your project.
 
     Yeah... that. You know, it's a programmer's duty to honor their projects
     with a distinctive name. Do not fail with the venerable traditions.
@@ -137,7 +137,7 @@
     from main will happily find the address and pop it.
 
     Note: how to get the return address to push it onto the stack is not
-    necessarily obviously. On x86 real mode (and even in 32-bit for that
+    necessarily obvious. On x86 real mode (and even in 32-bit for that
     matter), you can't read the value of the instruction pointer register
     to know where is the address of the next instruction. The trick, here
     is to call an auxiliary function whose only purpose is to "discover"
