@@ -177,10 +177,9 @@ void f_list_disk()
 
 void f_exec_prog() {
     // Program to execute
-    char *prog_name;
 	kwrite("Enter the executable's name: ");
-    char program_name[DIR_ENTRY_LEN];
-    kread(program_name);
+    char executable_name[DIR_ENTRY_LEN + 1] = {0};
+    kread(executable_name);
 
 	// Pointer to the FS header in RAM
     struct fs_header_t *header = (struct fs_header_t *)0x7c00;
@@ -200,7 +199,7 @@ void f_exec_prog() {
     int found = 0;
 	int index = 0;
     for (index = 0; index < header->number_of_file_entries; index++, entry += DIR_ENTRY_LEN) {
-        if (strcmp((char *)entry, prog_name) == 0) {
+        if (strcmp((char *)entry, executable_name) == 0) {
             found = 1;
             break;
         }
