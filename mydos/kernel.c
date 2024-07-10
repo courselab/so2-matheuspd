@@ -84,10 +84,10 @@ void shell()
 
 struct cmd_t cmds[] =
 	{
-		{"help", f_help},	   /* Print a help message.       */
-		{"quit", f_quit},	   /* Exit TyDOS.                 */
-		//{"exec_prog",    f_exec_prog},     	/* Execute an example program. */
-		{"list", f_list_disk}, /* List all files */
+		{"help", f_help},	                /* Print a help message.       */
+		{"quit", f_quit},	                /* Exit TyDOS.                 */
+		{"exec_prog",    f_exec_prog},     	/* Execute an example program. */
+		{"list", f_list_disk},              /* List all files */
 		{0, 0}};
 
 struct fs_header_t
@@ -156,7 +156,7 @@ void f_list_disk()
 
 	// Calculate the starting sector of the directory region
 	unsigned short dir_start_sector = header->number_of_boot_sectors + 1;
-	unsigned short num_entries = header->number_of_file_entries * DIR_ENTRY_LEN / SECTOR_SIZE;
+	unsigned short num_entries = header->number_of_file_entries*DIR_ENTRY_LEN/SECTOR_SIZE;
 
 	extern unsigned char _MEM_POOL;
 	void *dir_address = (void *)&_MEM_POOL;
@@ -175,18 +175,63 @@ void f_list_disk()
 	kwrite("\n");
 }
 
-void f_exec_prog()
-{
-  // Program to execute
-  const char *prog_name = "prog.bin";
-  struct fs_header_t *header = (struct fs_header_t *)0x7c00;
-  unsigned short dir_start_sector = header->number_of_boot_sectors + 1;
-  unsigned short num_entries = header->number_of_file_entries * DIR_ENTRY_LEN / SECTOR_SIZE;
+void f_exec_prog() {
+    // Program to execute
+    char *prog_name;
+	kwrite("Enter the executable's name: ");
+    char program_name[DIR_ENTRY_LEN];
+    kread(program_name);
 
-  extern unsigned char _MEM_POOL;
-  void *dir_address = (void *)&_MEM_POOL;
+	// Pointer to the FS header in RAM
+    struct fs_header_t *header = (struct fs_header_t *)0x7c00;
 
-  // Load the directory entries into memory
-  load_disk(dir_start_sector, num_entries, dir_address);
+	// Calculate the starting sector of the directory region
+    unsigned short dir_start_sector = header->number_of_boot_sectors + 1;
+    unsigned short num_entries = header->number_of_file_entries*DIR_ENTRY_LEN/SECTOR_SIZE;
 
+    extern unsigned char _MEM_POOL;
+    void *dir_address = (void *)&_MEM_POOL;
+
+    // Load the directory entries into memory
+    load_disk(dir_start_sector, num_entries, dir_address);
+
+    // Find the program in the directory entries
+    unsigned char *entry = (unsigned char *)dir_address;
+    int found = 0;
+	int index = 0;
+    for (index = 0; index < header->number_of_file_entries; index++, entry += DIR_ENTRY_LEN) {
+        if (strcmp((char *)entry, prog_name) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        kwrite("Program not found.\n");
+        return;
+    }
+
+    // Calculate the starting sector of the program and memory offset
+	int prog_start_sector = dir_start_sector + num_entries + header->max_file_size*index - 1;
+  	int mem_offset = header->number_of_file_entries*DIR_ENTRY_LEN - (num_entries - 1)*SECTOR_SIZE;
+
+  	void *mem_loc = (void *)USER_PROGRAM_LOAD_ADDRESS - mem_offset;
+
+    // Load the program into memory at 0xFE00
+    load_disk(prog_start_sector, header->max_file_size, mem_loc);
+
+	 __asm__ volatile(
+    "call save_return_address \n"
+    "original_address: \n"
+    "	push %%ebx \n"
+    "	jmp %[programAddress] \n"
+    "save_return_address: \n"
+    "	mov (%%esp), %%ebx \n"
+    "	mov $program_end, %%ecx\n"
+    "	sub $original_address, %%ecx\n"
+    "	add %%ecx, %%ebx\n"
+    "	ret \n"
+    "program_end: \n" ::
+	[programAddress] "r" (USER_PROGRAM_LOAD_ADDRESS));
 }
+

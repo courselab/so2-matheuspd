@@ -33,12 +33,15 @@ void shell();			/* Command interpreter. */
 #define FS_SIGLEN 4
 #define SECTOR_SIZE 512
 
+#define USER_PROGRAM_LOAD_ADDRESS 0xFE00
+
 /* Built-in commands. */
 
 void f_help();
 void f_exec();
 void f_quit();
 void f_list_disk();
+void f_exec_prog();
 
 extern struct cmd_t
 {
