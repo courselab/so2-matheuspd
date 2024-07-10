@@ -220,17 +220,19 @@ void f_exec_prog() {
     load_disk(prog_start_sector, header->max_file_size, mem_loc);
 
 	 __asm__ volatile(
-    "call save_return_address \n"
+    "call save_ret_address \n"
+
     "original_address: \n"
     "	push %%ebx \n"
-    "	jmp %[programAddress] \n"
-    "save_return_address: \n"
+    "	jmp %[prog_addr] \n"
+
+    "save_ret_address: \n"
     "	mov (%%esp), %%ebx \n"
-    "	mov $program_end, %%ecx\n"
+    "	mov $prog_end, %%ecx\n"
     "	sub $original_address, %%ecx\n"
     "	add %%ecx, %%ebx\n"
     "	ret \n"
-    "program_end: \n" ::
-	[programAddress] "r" (USER_PROGRAM_LOAD_ADDRESS));
+    "prog_end: \n" ::
+	[prog_addr] "r" (USER_PROGRAM_LOAD_ADDRESS));
 }
 
