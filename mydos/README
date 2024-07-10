@@ -95,7 +95,7 @@
 
     Try it with QEMU x86 emulator.
 
-       make mydos.bin/run
+    make run IMG=disk.img
 
     should do it (replace 'mydos' with your DOS name).
 

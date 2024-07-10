@@ -68,7 +68,7 @@ kwrite:
 kwrite_loop:
 	
 	mov (%si), %al		/* Get each ASCII character.           */
-        cmp $0x0, %al		/* End writing on 0.                   */
+        cmp $0x0, %al   /* End writing on 0.                   */
         je kwrite_end
         int $0x10		/* Call BIOS video service.            */
 
@@ -117,7 +117,7 @@ halt:
 	## Boot's second stage.
 
 load_kernel:
-	pusha			/* Save all GP registers.              */
+	pusha			        /* Save all GP registers. */
 
 	/* Compute the kernel size in sectors.  */
 
