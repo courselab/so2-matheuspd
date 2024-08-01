@@ -24,3 +24,8 @@ Steps:
 8) load_disk loads the files into memory and f_list_disk shows the names of the loaded files. OK
 9) The crt0.S file was created and linked at the beginning of the program. OK
 10) kread changed to take the size of the string to be read as a second parameter; created the syscall sys_read to implement fgets. OK
+
+EVALUATION
+==========
+
+Way to go! Nailed it.
